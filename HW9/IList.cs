@@ -15,7 +15,7 @@ namespace HW9
 
         void AddBack(int value);
 
-        void AddByIndexElement(int index, int value);
+        void AddByIndex(int index, int value);
 
         void RemoveFrontElement();
 
