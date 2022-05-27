@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31829.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HW9", "HW9\HW9.csproj", "{5B15338E-199D-4FF2-B337-1C53A436F803}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListsUnitTests", "ListsUnitTests\ListsUnitTests.csproj", "{E0BEC453-F75B-4CA5-BA3E-FC264251180B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ListsUnitTests", "ListsUnitTests\ListsUnitTests.csproj", "{E0BEC453-F75B-4CA5-BA3E-FC264251180B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestConcole", "TestConcole\TestConcole.csproj", "{4E028B59-CB7E-409B-B2BA-B97E4B9130BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{E0BEC453-F75B-4CA5-BA3E-FC264251180B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0BEC453-F75B-4CA5-BA3E-FC264251180B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0BEC453-F75B-4CA5-BA3E-FC264251180B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E028B59-CB7E-409B-B2BA-B97E4B9130BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E028B59-CB7E-409B-B2BA-B97E4B9130BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E028B59-CB7E-409B-B2BA-B97E4B9130BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E028B59-CB7E-409B-B2BA-B97E4B9130BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
