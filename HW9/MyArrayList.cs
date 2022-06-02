@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace HW9
 {
@@ -48,7 +47,7 @@ namespace HW9
 
         public MyArrayList(int[] array)
         {
-            if (array==null)
+            if (array == null)
             {
                 throw new ArgumentException();
             }

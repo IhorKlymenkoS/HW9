@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HW9
 {
@@ -30,6 +29,7 @@ namespace HW9
         void RemoveByIndexNElements(int index, int value);
 
         int Capacity { get; }
+        int Length { get; }
 
         int FirstIndexByValue(int value);
 
