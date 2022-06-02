@@ -14,10 +14,12 @@ namespace HW9
             public Node(int element)
             {
                 Value = element;
+                NodeIndex = index;
             }
         }
 
-        private Node _head;
+        private Node _root;
+        public int _count { get; private set; }
 
         public int Capacity => _count;
 
@@ -175,8 +177,8 @@ namespace HW9
         {
             Node temp = _head;
             int value = _head.Value;
-            while (temp.Next != null)
-            {
+                while (temp.Next != null)
+                {
                 if (temp.Value > value)
                 {
                     value = temp.Value;
@@ -313,7 +315,7 @@ namespace HW9
             }
 
             _count +=tempArray.Length;
-        }
+                }
 
         public IEnumerator<int> GetEnumerator()
         {

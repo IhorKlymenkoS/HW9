@@ -292,7 +292,8 @@ namespace HW9
             {
                 throw new ArgumentNullException(nameof(array), "Array is null");
             }
-            int[] arrayTemp = new int[_array.Length + array.Length];
+            int tempLength = Length + array.Length;
+            int[] arrayTemp = new int[tempLength];
             int addArrayEnd = index + array.Length - 1;
             int oldArrayCount = 0;
             int addArrayCount = 0;
