@@ -20,7 +20,7 @@ namespace HW9
 
         void RemoveBackElement();
 
-        void RemoveByIndexElement(int index);
+        int RemoveByIndexElement(int index);
 
         void RemoveFrontNElements(int value);
 

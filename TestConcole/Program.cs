@@ -14,7 +14,7 @@ namespace TestConcole
             {
                 ml.AddBack(i);
             }
-            Console.WriteLine(ml._count);
+            //Console.WriteLine(ml._count);
 
             
 

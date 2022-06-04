@@ -109,9 +109,11 @@ namespace HW9
             RemoveByIndexNElements(Length-1, 1);
         }
 
-        public void RemoveByIndexElement(int index)
+        public int RemoveByIndexElement(int index)
         {
             RemoveByIndexNElements(index, 1);
+
+            return 0;
         }
 
         public void RemoveFrontNElements(int value)
