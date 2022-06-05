@@ -99,14 +99,20 @@ namespace HW9
             _array = arrayTemp;
         }
 
-        public void RemoveFrontElement()
+        public int RemoveFrontElement()
         {
-            RemoveByIndexNElements(0, 1);
+            int[] temp = RemoveByIndexNElements(0, 1);
+            int result = temp[0];
+
+            return result;
         }
 
-        public void RemoveBackElement()
+        public int RemoveBackElement()
         {
-            RemoveByIndexNElements(Length-1, 1);
+            int[] temp = RemoveByIndexNElements(Length - 1, 1);
+            int result = temp[0];
+
+            return result;
         }
 
         public int RemoveByIndexElement(int index)
@@ -116,17 +122,22 @@ namespace HW9
             return 0;
         }
 
-        public void RemoveFrontNElements(int value)
+        public int[] RemoveFrontNElements(int value)
         {
             RemoveByIndexNElements(0, value);
+            int[] resolt = new int[value];
+            return resolt;
         }
 
-        public void RemoveBackNElements(int value)
+        public int[] RemoveBackNElements(int value)
         {
             RemoveByIndexNElements(Length - value, value);
+
+            int[] resolt = new int[value];
+            return resolt;
         }
 
-        public void RemoveByIndexNElements(int index, int count)
+        public int[] RemoveByIndexNElements(int index, int count)
         {
             var endPosition = index + count;
             if (endPosition > Length)
@@ -150,6 +161,9 @@ namespace HW9
             }
 
             _currentCount -= count;
+
+            int[] resolt = new int[count];
+            return resolt;
         }
 
         public int FirstIndexByValue(int value)
@@ -258,7 +272,7 @@ namespace HW9
             return index;
         }
 
-        public int DeleteByValueAll(int value)
+        public int[] DeleteByValueAll(int value)
         {
             int j = 0;
             int i;
@@ -272,9 +286,9 @@ namespace HW9
             }
 
             _array = arrayTemp;
-
-            int count = i - j;
-            _currentCount = -count;
+            int countI=0;
+            int[] count = new int[2];
+            _currentCount = -countI;
             return count;
         }
 

@@ -16,17 +16,17 @@ namespace HW9
 
         void AddByIndex(int index, int value);
 
-        void RemoveFrontElement();
+        int RemoveFrontElement();
 
-        void RemoveBackElement();
+        int RemoveBackElement();
 
         int RemoveByIndexElement(int index);
 
-        void RemoveFrontNElements(int value);
+        int[] RemoveFrontNElements(int value);
 
-        void RemoveBackNElements(int value);
+        int[] RemoveBackNElements(int value);
 
-        void RemoveByIndexNElements(int index, int value);
+        int[] RemoveByIndexNElements(int index, int value);
 
         int Capacity { get; }
         int Length { get; }
@@ -47,7 +47,7 @@ namespace HW9
 
         int DeleteByValueFirst(int value);
 
-        int DeleteByValueAll(int value);
+        int[] DeleteByValueAll(int value);
 
         void AddFrontArray(int[] array);
 

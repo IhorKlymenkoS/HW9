@@ -14,7 +14,7 @@ namespace ListsUnitTests
         [Test]
         public void DefaultConsructor_ShouldCreateEmptyList()
         {
-            IList actualList = new MyArrayList();
+            IList actualList = new MyLinkedList();
 
             CollectionAssert.AreEqual(new int[] { }, actualList);
         }
@@ -67,7 +67,7 @@ namespace ListsUnitTests
         }
 
         [TestCase(new int[] { }, 0, 10, new[] { 10 })]
-        [TestCase(new [] { 5 }, 0, 3, new[] { 3, 5 })]
+        [TestCase(new[] { 5 }, 0, 3, new[] { 3, 5 })]
         [TestCase(new[] { 6 }, 1, 8, new[] { 6, 8 })]
         [TestCase(new[] { 1, 2, 3 }, 0, 5, new[] { 5, 1, 2, 3 })]
         [TestCase(new[] { 1, 2, 3 }, 2, 7, new[] { 1, 2, 7, 3 })]
@@ -82,17 +82,18 @@ namespace ListsUnitTests
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
 
-        [TestCase(new[] { 5 }, new int[] { })]
-        [TestCase(new[] { 1, 2, 3 }, new[] { 2, 3 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, new[] { 9, 2, 4, 5 })]
+        [TestCase(new[] { 5 }, new int[] { }, 5)]
+        [TestCase(new[] { 1, 2, 3 }, new[] { 2, 3 }, 1)]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, new[] { 9, 2, 4, 5 }, 7)]
         public void RemoveFront_WhenValidParamsPassed_ShouldRemoveElementAtTheFront(
-   int[] sourceArray, int[] expectedArray)
+   int[] sourceArray, int[] expectedArray, int returnedElement)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveFrontElement();
+            int expectedElement = actualList.RemoveFrontElement();
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            Assert.AreEqual(expectedElement, returnedElement);
         }
 
         [TestCase(new int[] { })]
@@ -104,27 +105,26 @@ int[] sourceArray)
             {
                 actualList.RemoveFrontElement();
             }
-            catch (ArgumentException ex)
+            catch (IndexOutOfRangeException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
 
-        [TestCase(new[] { 5 }, new int[] { })]
-        [TestCase(new[] { 1, 2, 3 }, new[] { 1, 2 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, new[] { 7, 9, 2, 4 })]
+        [TestCase(new[] { 5 }, new int[] { }, 5)]
+        [TestCase(new[] { 1, 2, 3 }, new[] { 1, 2 }, 3)]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, new[] { 7, 9, 2, 4 }, 5)]
         public void RemoveBack_WhenValidParamsPassed_ShouldRemoveElementAtTheBack(
-int[] sourceArray, int[] expectedArray)
+int[] sourceArray, int[] expectedArray, int returnedElement)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveBackElement();
+            int expectedElement = actualList.RemoveBackElement();
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            Assert.AreEqual(expectedElement, returnedElement);
         }
 
         [TestCase(new int[] { })]
@@ -136,9 +136,8 @@ int[] sourceArray)
             {
                 actualList.RemoveBackElement();
             }
-            catch (ArgumentException ex)
+            catch (IndexOutOfRangeException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
 
@@ -146,19 +145,20 @@ int[] sourceArray)
             Assert.Fail();
         }
 
-        [TestCase(new[] { 5 }, 0, new int[] { })]
-        [TestCase(new[] { 1, 2, 3 }, 1, new[] { 1, 3 })]
-        [TestCase(new[] { 1, 2, 8, 3, 5 }, 3, new[] { 1, 2, 8, 5 })]
-        [TestCase(new[] { 1, 2, 8, 3, 5 }, 0, new[] { 2, 8, 3, 5 })]
-        [TestCase(new[] { 1, 2, 8, 3, 5 }, 4, new[] { 1, 2, 8, 3 })]
+        [TestCase(new[] { 5 }, 0, new int[] { }, 5)]
+        [TestCase(new[] { 1, 2, 3 }, 1, new[] { 1, 3 }, 2)]
+        [TestCase(new[] { 1, 2, 8, 3, 5 }, 3, new[] { 1, 2, 8, 5 }, 3)]
+        [TestCase(new[] { 1, 2, 8, 3, 5 }, 0, new[] { 2, 8, 3, 5 }, 1)]
+        [TestCase(new[] { 1, 2, 8, 3, 5 }, 4, new[] { 1, 2, 8, 3 }, 5)]
         public void RemoveByIndexElement_WhenValidParamsPassed_ShouldRemoveElementByIndex(
-int[] sourceArray, int index, int[] expectedArray)
+int[] sourceArray, int index, int[] expectedArray, int returnedElement)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveByIndexElement(index);
+            int expectedElement = actualList.RemoveByIndexElement(index);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            Assert.AreEqual(expectedElement, returnedElement);
         }
 
         [TestCase(new int[] { }, 0)]
@@ -181,24 +181,25 @@ int[] sourceArray, int index)
             Assert.Fail();
         }
 
-        [TestCase(new[] { 5 }, 1, new int[] { })]
-        [TestCase(new[] { 1, 2, 3 }, 2, new[] { 3 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 3, new[] { 4, 5 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 0, new[] { 7, 9, 2, 4, 5 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 5, new int[] { })]
+        [TestCase(new[] { 5 }, 1, new int[] { }, new[] { 5 })]
+        [TestCase(new[] { 1, 2, 3 }, 2, new[] { 3 }, new[] { 1, 2 })]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 3, new[] { 4, 5 }, new[] { 7, 9, 2 })]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 5, new int[] { }, new[] { 7, 9, 2, 4, 5 })]
         public void RemoveFrontNElements_WhenValidParamsPassed_ShouldRemoveNElementsAtTheFront(
-int[] sourceArray, int count, int[] expectedArray)
+int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveFrontNElements(count);
+            int[] remoteArray = actualList.RemoveFrontNElements(count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            CollectionAssert.AreEqual(remoteArray, returnedArray);
         }
 
         [TestCase(new int[] { }, 1)]
         [TestCase(new[] { 1, 2, 3 }, 8)]
         [TestCase(new[] { 1, 2, 3 }, -1)]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 0)]
         public void RemoveFrontNElements_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int count)
         {
@@ -207,34 +208,33 @@ int[] sourceArray, int count)
             {
                 actualList.RemoveFrontNElements(count);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
 
-        [TestCase(new[] { 5 }, 1, new int[] { })]
-        [TestCase(new[] { 1, 2, 3 }, 2, new[] { 1 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 3, new[] { 7, 9 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 0, new[] { 7, 9, 2, 4, 5 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 5, new int[] { })]
+        [TestCase(new[] { 5 }, 1, new int[] { }, new[] { 5 })]
+        [TestCase(new[] { 1, 2, 3 }, 2, new[] { 1 }, new[] { 2, 3 })]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 3, new[] { 7, 9 }, new[] { 2, 4, 5 })]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 5, new int[] { }, new[] { 7, 9, 2, 4, 5 })]
         public void RemoveBackNElements_WhenValidParamsPassed_ShouldRemoveNElementsAtTheBack(
-int[] sourceArray, int count, int[] expectedArray)
+int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveBackNElements(count);
+            int[] remoteArray = actualList.RemoveBackNElements(count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            CollectionAssert.AreEqual(remoteArray, returnedArray);
         }
 
         [TestCase(new int[] { }, 1)]
         [TestCase(new[] { 1, 2, 3 }, 8)]
         [TestCase(new[] { 1, 2, 3 }, -1)]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 0)]
         public void RemoveBackNElements_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int count)
         {
@@ -243,41 +243,38 @@ int[] sourceArray, int count)
             {
                 actualList.RemoveBackNElements(count);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
 
-        [TestCase(new[] { 5 }, 0, 1, new int[] {})]
-        [TestCase(new[] { 1, 2, 3 }, 0, 1, new [] { 2, 3 })]
-        [TestCase(new[] { 1, 2, 3 }, 0, 0, new [] {1, 2, 3 })]
-        [TestCase(new[] { 1, 2, 3 }, 0, 2, new [] { 3 })]
-        [TestCase(new[] { 1, 2, 3 }, 0, 3, new int[] {})]
-        [TestCase(new[] { 1, 2, 3 }, 1, 2, new[] { 1 })]
-        [TestCase(new[] { 1, 2, 3 }, 2, 1, new[] { 1, 2 })]
-        [TestCase(new[] { 1, 2, 3 }, 1, 1, new[] { 1, 3 })]
-        [TestCase(new[] { 7, 9, 2, 4, 5 }, 2, 2, new[] { 7, 9, 5 })]
+        [TestCase(new[] { 5 }, 0, 1, new int[] {}, new[] { 5 })]
+        [TestCase(new[] { 1, 2, 3 }, 0, 1, new [] { 2, 3 }, new[] { 1 })]
+        [TestCase(new[] { 1, 2, 3 }, 0, 3, new int[] { }, new[] { 1, 2, 3 })]
+        [TestCase(new[] { 1, 2, 3 }, 0, 2, new [] { 3 }, new[] { 1, 2 })]
+        [TestCase(new[] { 1, 2, 3 }, 1, 2, new[] { 1 }, new[] { 2, 3 })]
+        [TestCase(new[] { 1, 2, 3 }, 2, 1, new[] { 1, 2 }, new[] { 3 })]
+        [TestCase(new[] { 1, 2, 3 }, 1, 1, new[] { 1, 3 }, new[] { 2 })]
+        [TestCase(new[] { 7, 9, 2, 4, 5 }, 2, 2, new[] { 7, 9, 5 }, new[] { 2, 4 })]
         public void RemoveNByIndex_WhenValidArgsPassed_ShouldRemoveElements
-            (int[] sourceArray, int index, int count, int[] expectedArray)
+            (int[] sourceArray, int index, int count, int[] expectedArray, int[] returnedArray)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.RemoveByIndexNElements(index, count);
+            int[] remoteArray = actualList.RemoveByIndexNElements(index, count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            CollectionAssert.AreEqual(remoteArray, returnedArray);
         }
 
-        [TestCase(new int[] { }, 0, 1)]
-        [TestCase(new int[] { }, 1, 0)]
-        [TestCase(new[] { 1, 2, 3 }, -1, 0)]
-        [TestCase(new[] { 1, 2, 3 }, -1, -1)]
-        [TestCase(new[] { 1, 2, 3 }, 8, 2)]
         [TestCase(new[] { 1, 2, 3 }, 1, 10)]
+        [TestCase(new[] { 1, 2, 3 }, 1, -10)]
+        [TestCase(new[] { 1, 2, 3 }, 1, 0)]
+        [TestCase(new[] { 1, 2, 3, 4 , 5 }, 2, 4)]
+        [TestCase(new[] { 1, 2, 3 }, 0, 0)]
         public void RemoveNByIndex_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int index, int count)
         {
@@ -286,12 +283,31 @@ int[] sourceArray, int index, int count)
             {
                 actualList.RemoveByIndexNElements(index, count);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
 
+            Assert.Fail();
+        }
+
+        [TestCase(new int[] { }, 0, 1)]
+        [TestCase(new int[] { }, 1, 0)]
+        [TestCase(new[] { 1, 2, 3 }, -1, 0)]
+        [TestCase(new[] { 1, 2, 3 }, -1, -1)]
+        [TestCase(new[] { 1, 2, 3 }, 8, 2)]
+        public void RemoveNByIndex_WhenValidParamsNotPassed_ShouldCatchIndexOutOfRangeException(
+int[] sourceArray, int index, int count)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+            try
+            {
+                actualList.RemoveByIndexNElements(index, count);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Assert.Pass();
+            }
 
             Assert.Fail();
         }
@@ -386,12 +402,10 @@ int[] sourceArray)
             {
                 actualList.GetMinElementValue();
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
@@ -427,7 +441,6 @@ int[] sourceArray)
                 Assert.Pass();
             }
 
-
             Assert.Fail();
         }
 
@@ -457,12 +470,10 @@ int[] sourceArray)
             {
                 actualList.GetMinElementIndex();
             }
-            catch (ArgumentException ex)
+            catch (InvalidOperationException)
             {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
@@ -487,79 +498,48 @@ int[] sourceArray)
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
 
-        [TestCase(new[] { 1 }, 1, new int[] { })]
-        [TestCase(new[] { 4, 1, 3 }, 3, new[] { 4, 1 })]
-        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, new[] { 1, 3, 9, 4, 2 })]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, new[] { 11, 44, 0, 72, -5, -22 })]
+        [TestCase(new[] { 1 }, 1, 0, new int[] { })]
+        [TestCase(new[] { 4, 1, 3 }, 3, 2, new[] { 4, 1 })]
+        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, 0, new[] { 1, 3, 9, 4, 2 })]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, 1, new[] { 11, 44, 0, 72, -5, -22 })]
+        [TestCase(new int[] { }, 2, -1, new int[] { })]
+        [TestCase(new[] { 1 }, 2, -1, new[] { 1 })]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99, -1, new[] { 11, -22, 44, 0, 72, -5, -22 })]
         public void DeleteByValueFirst_WhenValidArgsPassed_ShouldDeleteByValueFirst
-(int[] sourceArray, int value, int[] expectedArray)
+(int[] sourceArray, int value, int expectedIndex, int[] expectedArray)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            actualList.DeleteByValueFirst(value);
+            int actualIndex = actualList.DeleteByValueFirst(value);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+            Assert.AreEqual(expectedIndex, actualIndex);
         }
 
-        [TestCase(new int[] { }, 2)]
-        [TestCase(new[] { 1 }, 2)]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99)]
-        public void DeleteByValueFirst_WhenValidParamsNotPassed_ShouldCatchArgumentException(
-int[] sourceArray, int value)
-        {
-            IList actualList = new MyLinkedList(sourceArray);
-            try
-            {
-                actualList.DeleteByValueFirst(value);
-            }
-            catch (ArgumentException ex)
-            {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
-                Assert.Pass();
-            }
 
-
-            Assert.Fail();
-        }
-
-        [TestCase(new[] { 1 }, 1, 1, new int[] { })]
-        [TestCase(new[] { 4, 1, 3 }, 3, 1, new[] { 4, 1 })]
-        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, 2, new[] { 1, 3, 9, 2 })]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, 2, new[] { 11, 44, 0, 72, -5 })]
-        [TestCase(new[] { 1, 0, 0, 1, 1, 0, 1 }, 0, 3, new[] { 1, 1, 1, 1 })]
+        [TestCase(new[] { 1 }, 1, new int[] { }, new[] { 0 })]
+        [TestCase(new[] { 4, 1, 3 }, 3, new[] { 4, 1 }, new[] { 2 })]
+        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, new[] { 1, 3, 9, 2 }, new[] { 0, 4 })]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, new[] { 11, 44, 0, 72, -5 }, new[] { 1, 6 })]
+        [TestCase(new[] { 1, 0, 0, 1, 1, 0, 1 }, 0, new[] { 1, 1, 1, 1 }, new[] { 1, 2 ,5 })]
+        [TestCase(new int[] { }, 2, new int[] { }, new[] { -1 })]
+        [TestCase(new[] { 1 }, 2, new[] { 1 }, new[] { -1 })]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99, new[] { 11, -22, 44, 0, 72, -5, -22 }, new[] { -1 })]
         public void DeleteByValueAll_WhenValidArgsPassed_ShouldDeleteByValueAll
-(int[] sourceArray, int value, int expectedCount, int[] expectedArray)
+(int[] sourceArray, int value, int[] expectedArray, int[] expectedIndices)
         {
             IList actualList = new MyLinkedList(sourceArray);
 
-            int actualCount = actualList.DeleteByValueAll(value);
+            int[] actualIndices = actualList.DeleteByValueAll(value);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
-            Assert.AreEqual(expectedCount, actualCount);
-        }
-
-        [TestCase(new int[] { }, 2)]
-        [TestCase(new[] { 1 }, 2)]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99)]
-        public void DeleteByValueAll_WhenValidParamsNotPassed_ShouldCatchArgumentException(
-int[] sourceArray, int value)
-        {
-            IList actualList = new MyLinkedList(sourceArray);
-            try
-            {
-                actualList.DeleteByValueAll(value);
-            }
-            catch (ArgumentException ex)
-            {
-                Assert.AreEqual("Value does not fall within the expected range.", ex.Message);
-                Assert.Pass();
-            }
-
-
-            Assert.Fail();
+            CollectionAssert.AreEqual(expectedIndices, actualIndices);
         }
 
         [TestCase(new[] { 4, 1, 3 }, new[] { 1, 3 }, new[] { 1, 3, 4, 1, 3 })]
+        [TestCase(new[] { 1 }, new[] { 3 }, new[] { 3, 1 })]
+        [TestCase(new[] { 1, 2, 3 }, new[] { 3, 2, 1 }, new[] { 3, 2, 1, 1, 2, 3 })]
+        [TestCase(new int[] { }, new[] { 5 }, new[] { 5 })]
         public void AddFrontArray_WhenValidArgsPassed_ShouldAddFrontArray
 (int[] sourceArray, int[] addArray, int[] expectedArray)
         {
@@ -570,18 +550,106 @@ int[] sourceArray, int value)
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
 
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new int[] { })]
+        public void AddFrontArray_WhenArrayNotPassedWithNotValidIndexesd_CatchArgumentException
+            (int[] sourceArray, int[] addArray)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+            try
+            {
+                actualList.AddFrontArray(addArray);
+            }
+            catch (NullReferenceException)
+            {
+                Assert.Pass();
+            }
+
+            Assert.Fail();
+        }
+
+        [TestCase(new[] { 4, 1, 3 }, new[] { 1, 3 }, new[] { 4, 1, 3, 1, 3 })]
+        [TestCase(new[] { 1 }, new[] { 3 }, new[] { 1, 3 })]
+        [TestCase(new[] { 1, 2, 3 }, new[] { 3, 2, 1 }, new[] { 1, 2, 3, 3, 2, 1})]
+        [TestCase(new int[] { }, new[] { 5 }, new[] { 5 })]
+        public void AddBackArray_WhenValidArgsPassed_ShouldAddBackArray
+(int[] sourceArray, int[] addArray, int[] expectedArray)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+
+            actualList.AddBackArray(addArray);
+
+            CollectionAssert.AreEqual(expectedArray, actualList);
+        }
+
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new int[] { })]
+        public void AddBackArray_WhenArrayNotPassedWithNotValidIndexesd_CatchArgumentException
+    (int[] sourceArray, int[] addArray)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+            try
+            {
+                actualList.AddBackArray(addArray);
+            }
+            catch (NullReferenceException)
+            {
+                Assert.Pass();
+            }
+
+            Assert.Fail();
+        }
+
         [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, 2, new[] { 1, 2, 9, 9, 9, 3, 4, 5 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, 0, new[] { 9, 9, 9, 1, 2, 3, 4, 5 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, 4, new[] { 1, 2, 3, 4, 9, 9, 9, 5 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, 5, new[] { 1, 2, 3, 4, 5, 9, 9, 9 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5, 6 }, new[] { 9, 9, 9 }, 2, new[] { 1, 2, 9, 9, 9, 3, 4, 5, 6 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5, 6 }, new[] { 9, 9, 9, 9 }, 2, new[] { 1, 2, 9, 9, 9, 9, 3, 4, 5, 6 })]
+        [TestCase(new int[] { }, new[] { 9, 9, 9 }, 0, new[] {9, 9, 9 })]
+        [TestCase(new[] { 1 }, new[] { 3 }, 1, new[] { 1, 3 })]
         public void AddByIndex_WhenArrayPassedWithValidIndexesAndNotEmpty_ShouldInsertArrayByPosition
      (int[] sourceArray, int[] arrayToInsert, int insertPosition, int[] expectedArray)
         {
-            //Arrange
             IList actualList = new MyLinkedList(sourceArray);
 
-            //Act
             actualList.AddByIndex(insertPosition, arrayToInsert);
 
-            //Assert
             CollectionAssert.AreEqual(expectedArray, actualList);
+        }
+
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, -5)]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 9, 9, 9 }, 6)]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new int[] { }, -1)]
+        public void AddByIndex_WhenArrayNotPassedWithNotValidIndexes_ShouldCatchArgumentException
+(int[] sourceArray, int[] arrayToInsert, int insertPosition)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+            try
+            {
+                actualList.AddByIndex(insertPosition, arrayToInsert);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Assert.Pass();
+            }
+
+            Assert.Fail();
+        }
+
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, new int[] { }, 1)]
+        public void AddByIndex_WhenArrayNotPassedWithValidIndexesAndEmpty_ShouldCatchArgumentException
+(int[] sourceArray, int[] arrayToInsert, int insertPosition)
+        {
+            IList actualList = new MyLinkedList(sourceArray);
+            try
+            {
+                actualList.AddByIndex(insertPosition, arrayToInsert);
+            }
+            catch (NullReferenceException)
+            {
+                Assert.Pass();
+            }
+
+            Assert.Fail();
         }
 
         [Test]

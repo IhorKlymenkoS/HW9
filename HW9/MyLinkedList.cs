@@ -31,11 +31,12 @@ namespace HW9
 
         public MyLinkedList()
         {
-
+            _count = 0;
         }
 
         public MyLinkedList(int element)
         {
+            _count = 1;
             _head = new Node(element);
         }
 
@@ -45,6 +46,57 @@ namespace HW9
             {
                 AddBack(item);
             }
+        }
+
+        private (int index, int value) GetMaxValueIndexAndValue()
+        {
+            if (_head == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            Node temp = _head;
+            int maxValue = _head.Value;
+            int currentIndex = 0;
+            int maxIndex = currentIndex;
+            do
+            {
+                if (temp.Value > maxValue)
+                {
+                    maxValue = temp.Value;
+                    maxIndex = currentIndex;
+                }
+
+                ++currentIndex;
+                temp = temp.Next;
+            } while (temp != null);
+
+            return (maxIndex, maxValue);
+        }
+        private (int index, int value) GetMinValueIndexAndValue()
+        {
+            if (_head == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            Node temp = _head;
+            int maxValue = _head.Value;
+            int currentIndex = 0;
+            int maxIndex = currentIndex;
+            do
+            {
+                if (temp.Value < maxValue)
+                {
+                    maxValue = temp.Value;
+                    maxIndex = currentIndex;
+                }
+
+                ++currentIndex;
+                temp = temp.Next;
+            } while (temp != null);
+
+            return (maxIndex, maxValue);
         }
 
         public void AddBack(int value)
@@ -86,14 +138,28 @@ namespace HW9
             ++_count;
         }
 
-        public void RemoveFrontElement()
+        public int RemoveFrontElement()
         {
-            RemoveByIndexElement(0);
+            if (_count==0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            int result = RemoveByIndexElement(0);
+
+            return result;
         }
 
-        public void RemoveBackElement()
+        public int RemoveBackElement()
         {
-            RemoveByIndexElement(Length);
+            if (_count == 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            int result = RemoveByIndexElement(Length-1);
+
+            return result;
         }
 
         public int RemoveByIndexElement(int index)
@@ -128,22 +194,48 @@ namespace HW9
             return result;
         }
 
-        public void RemoveFrontNElements(int value)
+        public int[] RemoveFrontNElements(int value)
         {
-            RemoveByIndexNElements(0,value);
-        }
-
-        public void RemoveBackNElements(int value)
-        {
-            RemoveByIndexNElements((Length - value), value);
-        }
-
-        public void RemoveByIndexNElements(int index, int value)
-        {
-            for (int i = 0; i <= value; i++)
+            if (value > Length || value <= 0)
             {
-                RemoveByIndexElement(index);
+                throw new ArgumentException();
             }
+
+            int[] resolt = RemoveByIndexNElements(0,value);
+
+            return resolt;
+        }
+
+        public int[] RemoveBackNElements(int value)
+        {
+            if (value > Length || value <= 0)
+            {
+                throw new ArgumentException();
+            }
+
+            int[] resolt = RemoveByIndexNElements((Length - value), value);
+
+            return resolt;
+        }
+
+        public int[] RemoveByIndexNElements(int index, int value)
+        {
+            if (index >= Length || index < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            if ((index+value) > Length || value <= 0)
+            {
+                throw new ArgumentException();
+            }
+
+            int[] resolt = new int[value];
+            for (int i = 0; i < value; i++)
+            {
+                resolt[i] = RemoveByIndexElement(index);
+            }
+
+            return resolt;
         }
 
         public int FirstIndexByValue(int value)
@@ -164,11 +256,20 @@ namespace HW9
 
         public void Reverse()
         {
-            Node temp = _head;
-            MyLinkedList reverse = null;
-            while (temp.Next != null)
+            Node tempI = _head;
+            int index = 0;
+            int temp;
+            MyLinkedList reverse = new MyLinkedList();
+            do
             {
-                reverse.AddBack(temp.Value);
+                reverse.AddFront(tempI.Value);
+                index++;
+            } while (index == Length);
+
+            foreach (var item in this)
+            {
+                temp = reverse._head.Value;
+                reverse._head = reverse._head.Next;
             }
         }
 
@@ -180,43 +281,8 @@ namespace HW9
 
         public int GetMinElementValue()
         {
-            Node temp = _head;
-            int value = _head.Value;
-            while (temp.Next != null)
-            {
-                if (temp.Value < value)
-                {
-                    value = temp.Value;
-                }
-            }
-
+            var (_, value) = GetMinValueIndexAndValue();
             return value;
-        }
-
-        private (int index, int value) GetMaxValueIndexAndValue()
-        {
-            if (_head == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            Node temp = _head;
-            int maxValue = _head.Value;
-            int currentIndex = 0;
-            int maxIndex = currentIndex;
-            do
-            {
-                if (temp.Value > maxValue)
-                {
-                    maxValue = temp.Value;
-                    maxIndex = currentIndex;
-                }
-
-                ++currentIndex;
-                temp = temp.Next;
-            } while (temp != null);
-
-            return (maxIndex, maxValue);
         }
 
         public int GetMaxElementIndex()
@@ -227,9 +293,7 @@ namespace HW9
 
         public int GetMinElementIndex()
         {
-            int value = GetMinElementValue();
-            int index = FirstIndexByValue(value);
-
+            var (index, _) = GetMinValueIndexAndValue();
             return index;
         }
 
@@ -254,35 +318,57 @@ namespace HW9
 
                 tempI = tempI.Next;
             }
-
         }
 
         public int DeleteByValueFirst(int value)
         {
             int index = FirstIndexByValue(value);
-
-            if (index!=-1)
+            if (index>=0)
             {
                 RemoveByIndexElement(index);
-                _count -= 1;
             }
 
             return index;
         }
 
-        public int DeleteByValueAll(int value)
+        public int[] DeleteByValueAll(int value)
         {
+ 
+            MyLinkedList tempList = new MyLinkedList();
             int index = 0;
             int count = 0;
-            while(index!=-1)
+            foreach (var item in this)
             {
-                index = FirstIndexByValue(value);
-                RemoveByIndexElement(index);
-                count++;
+                if (item == value)
+                {
+                    tempList.AddFront(index);
+                    count++;
+                }
+
+                ++index;
             }
 
-            _count -= count;
-            return count;
+            int[] result;
+            if (count!=0)
+            {
+                Node temp = tempList._head;
+                result = new int[count];
+
+                for (int i = 0; i < count; i++)
+                {
+                    result[i] = temp.Value;
+                    RemoveByIndexElement(temp.Value);
+                    temp = temp.Next;
+                }
+            }
+            else
+            {
+                result = new int[1];
+                result[0] = -1;
+            }
+
+
+            return result;
         }
 
         public void AddFrontArray(int[] array)
@@ -300,6 +386,10 @@ namespace HW9
             if (index > Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
+            }
+            if (array==null)
+            {
+                throw new NullReferenceException();
             }
 
             Node current = _head;
