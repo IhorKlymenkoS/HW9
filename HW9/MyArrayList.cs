@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HW9
 {
-    public class MyArrayList : IList
+    public class MyArrayList<T> : IList<T>
+        where T : IComparable<T>
     {
         private const double IncreaseCoefficient = 1.33;
         private const int DefaultSize = 4;
-        private int[] _array;
+        private T[] _array;
         private int _currentCount;
 
         public int Capacity => _array.Length;
         public int Length => _currentCount;//orient on it while going through elements
 
-        public int this[int index]//protection from index out of range
+        public T this[int index]//protection from index out of range
         {
             get
             {
@@ -39,20 +41,26 @@ namespace HW9
         {
         }
 
-        public MyArrayList(int capacity)
+        public MyArrayList(T capacity)
         {
-            capacity = Math.Max(capacity, DefaultSize);
-            _array = new int[capacity];
+            if (capacity.CompareTo(DefaultSize) == -1)
+            {
+                capacity = DefaultSize;
+            }
+
+            _array = new T[capacity];
         }
 
-        public MyArrayList(int[] array)
+        public MyArrayList(IEnumerable<T> source)
         {
-            if (array == null)
+            if (source == null)
             {
                 throw new ArgumentException();
             }
 
-            _array = new int[Math.Max(array.Length, DefaultSize)];//array == null??
+            T[] array = source.ToArray();
+
+            _array = new T[Math.Max(array.Length, DefaultSize)];//array == null??
             for (int i = 0; i < array.Length; i++)
             {
                 _array[i] = array[i];
@@ -61,17 +69,17 @@ namespace HW9
             _currentCount = array.Length;
         }
 
-        public void AddFront(int value)
+        public void AddFront(T value)
         {
             AddByIndex(0, value);
         }
 
-        public void AddBack(int value)
+        public void AddBack(T value)
         {
             AddByIndex(_currentCount, value);
         }
 
-        public void AddByIndex(int index, int value)
+        public void AddByIndex(int index, T value)
         {
             if(Length == Capacity)
             {
@@ -90,7 +98,7 @@ namespace HW9
         private void Resize()
         {
             var newLength = (int)(IncreaseCoefficient * Capacity);
-            int[] arrayTemp = new int[newLength];
+            T[] arrayTemp = new T[newLength];
             for (int i = 0; i < Length; i++)
             {
                 arrayTemp[i] = this[i];
@@ -99,46 +107,79 @@ namespace HW9
             _array = arrayTemp;
         }
 
-        public int RemoveFrontElement()
+        public T RemoveFrontElement()
         {
-            int[] temp = RemoveByIndexNElements(0, 1);
-            int result = temp[0];
+            if (Length<1)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            IEnumerable<T> tempI = RemoveByIndexNElements(0, 1);
+            T[] tempJ = tempI.ToArray();
+            T result = tempJ[0];
 
             return result;
         }
 
-        public int RemoveBackElement()
+        public T RemoveBackElement()
         {
-            int[] temp = RemoveByIndexNElements(Length - 1, 1);
-            int result = temp[0];
+            if (Length < 1)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            IEnumerable<T> tempI = RemoveByIndexNElements(Length - 1, 1);
+            T[] tempJ = tempI.ToArray();
+            T result = tempJ[0];
 
             return result;
         }
 
-        public int RemoveByIndexElement(int index)
+        public T RemoveByIndexElement(int index)
         {
-            RemoveByIndexNElements(index, 1);
+            if (Length < 1 || index<0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            IEnumerable<T> tempI = RemoveByIndexNElements(index, 1);
+            T[] tempJ = tempI.ToArray();
+            T result = tempJ[0];
 
-            return 0;
+            return result;
         }
 
-        public int[] RemoveFrontNElements(int value)
+        public IEnumerable<T> RemoveFrontNElements(int value)
         {
-            RemoveByIndexNElements(0, value);
-            int[] resolt = new int[value];
-            return resolt;
+            if (value > Length || value <= 0)
+            {
+                throw new ArgumentException();
+            }
+            IEnumerable<T> result = RemoveByIndexNElements(0, value);
+
+            return result;
         }
 
-        public int[] RemoveBackNElements(int value)
+        public IEnumerable<T> RemoveBackNElements(int count)
         {
-            RemoveByIndexNElements(Length - value, value);
+            if (count > Length || count <= 0)
+            {
+                throw new ArgumentException();
+            }
+            IEnumerable<T> result = RemoveByIndexNElements(Length - count, count);
 
-            int[] resolt = new int[value];
-            return resolt;
+            return result;
         }
 
-        public int[] RemoveByIndexNElements(int index, int count)
+        public IEnumerable<T> RemoveByIndexNElements(int index, int count)
         {
+            if (index >= Length || index < 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            if ((index + count) > Length || count <= 0)
+            {
+                throw new ArgumentException();
+            }
+            T[] result = new T[count];
+            int resultIndex = 0;
             var endPosition = index + count;
             if (endPosition > Length)
             {
@@ -157,21 +198,22 @@ namespace HW9
                 i < Length;
                 i++, j++)
             {
+                result[resultIndex] = _array[j];
                 _array[j] = _array[i];
+                resultIndex++;
             }
 
             _currentCount -= count;
 
-            int[] resolt = new int[count];
-            return resolt;
+            return result;
         }
 
-        public int FirstIndexByValue(int value)
+        public int FirstIndexByValue(T value)
         {
             int index = -1;
             for (int i = 0; i < Length; i++)
             {
-                if (_array[i] == value)
+                if (_array[i].CompareTo(value)==0)
                 {
                     index = i;
                     break;
@@ -183,7 +225,7 @@ namespace HW9
 
         public void Reverse()
         {
-            int[] arrayTemp = new int[Length];
+            T[] arrayTemp = new T[Length];
             int j = arrayTemp.Length - 1;
 
             for (int i = 0; i < Length; i++)
@@ -194,17 +236,17 @@ namespace HW9
             _array = arrayTemp;
         }
 
-        public int GetMaxElementValue()
+        public T GetMaxElementValue()
         {
             if (Length<1)
             {
                 throw new ArgumentException();
             }
 
-            int max = _array[0];
+            T max = _array[0];
             for (int i = 0; i < Length; i++)
             {
-                if (max < _array[i])
+                if (max.CompareTo(_array[i])==-1)
                 {
                     max = _array[i];
                 }
@@ -213,17 +255,17 @@ namespace HW9
             return max;
         }
 
-        public int GetMinElementValue()
+        public T GetMinElementValue()
         {
             if (Length < 1)
             {
                 throw new ArgumentException();
             }
 
-            int min = _array[0];
+            T min = _array[0];
             for (int i = 0; i < Length; i++)
             {
-                if (min > _array[i])
+                if (min.CompareTo(_array[i])==1)
                 {
                     min = _array[i];
                 }
@@ -257,14 +299,14 @@ namespace HW9
             }
         }
 
-        private void Swap(ref int a, ref int b)
+        private void Swap(ref T a, ref T b)
         {
-            int temp = a;
+            T temp = a;
             a = b;
             b = temp;
         }
 
-        public int DeleteByValueFirst(int value)
+        public int DeleteByValueFirst(T value)
         {
             int index = FirstIndexByValue(value);
             RemoveByIndexElement(index);
@@ -272,44 +314,52 @@ namespace HW9
             return index;
         }
 
-        public int[] DeleteByValueAll(int value)
+        public int DeleteByValueAll(T value)
         {
-            int j = 0;
-            int i;
-            int[] arrayTemp = new int[Length];
-            for (i = 0; i < arrayTemp.Length; i++)
+            int countAfterRemove = 0;
+            T[] arrayTemp = new T[Length];
+            for (int i = 0; i < arrayTemp.Length; i++)
             {
-                if (_array[i] != value)
+                if (_array[i].CompareTo(value)==1 || _array[i].CompareTo(value) == -1)
                 {
-                    arrayTemp[j++] = _array[i];
+                    arrayTemp[countAfterRemove++] = _array[i];
                 }
             }
 
             _array = arrayTemp;
-            int countI=0;
-            int[] count = new int[2];
-            _currentCount = -countI;
-            return count;
+
+            int result = _currentCount - countAfterRemove;
+            _currentCount = countAfterRemove;
+
+            return result;
         }
 
-        public void AddFrontArray(int[] array)
+        public void AddFrontItems(IEnumerable<T> source)
         {
-            AddByIndex(0, array);
+            T[] array = source.ToArray();
+            AddByIndexItems(0, array);
         }
 
-        public void AddBackArray(int[] array)
+        public void AddBackItems(IEnumerable<T> source)
         {
-            AddByIndex(Length+1, array);
+            T[] array = source.ToArray();
+            AddByIndexItems(Length+1, array);
         }
 
-        public void AddByIndex(int index, int[] array)
+        public void AddByIndexItems(int index, IEnumerable<T> source)
         {
-            if (Length<1)
+            T[] array = source.ToArray();
+            if (index > Length || index < 0)
             {
-                throw new ArgumentNullException(nameof(array), "Array is null");
+                throw new IndexOutOfRangeException();
             }
+            if (array == null)
+            {
+                throw new NullReferenceException();
+            }
+
             int tempLength = Length + array.Length;
-            int[] arrayTemp = new int[tempLength];
+            T[] arrayTemp = new T[tempLength];
             int addArrayEnd = index + array.Length - 1;
             int oldArrayCount = 0;
             int addArrayCount = 0;
@@ -332,7 +382,7 @@ namespace HW9
             _array = arrayTemp;
         }
 
-        public IEnumerator<int> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             for (int i = 0; i < Length; i++)
             {
@@ -343,6 +393,16 @@ namespace HW9
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public IList<T> Initialize()
+        {
+            return new MyArrayList<T>();
+        }
+
+        public IList<T> Initialize(IEnumerable<T> items)
+        {
+            return new MyArrayList<T>(items);
         }
     }
 }

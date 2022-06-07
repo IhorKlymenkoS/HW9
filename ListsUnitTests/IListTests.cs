@@ -1,11 +1,28 @@
 using HW9;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 
 namespace ListsUnitTests
 {
-    public class Tests
+
+    public class LinkedListTests : IListTests<MyLinkedList<int>>
     {
+        protected override MyLinkedList<int> Initializer
+            => new();
+    }
+
+    public class ArrayListTests : IListTests<MyLinkedList<int>>
+    {
+        protected override MyLinkedList<int> Initializer
+    => new();
+    }
+
+    public abstract class IListTests<T>
+        where T : HW9.IList<int>
+    {
+        protected abstract T Initializer { get; }
+
         [SetUp]
         public void Setup()
         {
@@ -14,16 +31,16 @@ namespace ListsUnitTests
         [Test]
         public void DefaultConsructor_ShouldCreateEmptyList()
         {
-            IList actualList = new MyLinkedList();
+            var actualList = Initializer.Initialize();
 
-            CollectionAssert.AreEqual(new int[] { }, actualList);
+            CollectionAssert.AreEqual(Array.Empty<int>(), actualList);
         }
 
         [TestCase(new[] { 1, 2, 3, 4, 5 }, new[] { 1, 2, 3, 4, 5 })]
         public void ConstructorFromArray_WhenSourceArrayChanged_ShouldNotChangeList
             (int[] sourceArray, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             sourceArray[2] = 10;
 
@@ -34,7 +51,7 @@ namespace ListsUnitTests
         public void ConstructorFromArray_WhenArrayNotEmpty_ShouldFillValuesInList
             (int[] sourceArray, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
@@ -45,11 +62,83 @@ namespace ListsUnitTests
         public void AddFront_WhenValidParamsPassed_ShouldInsertElementAtTheFront(
            int[] sourceArray, int insertValue, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             actualList.AddFront(insertValue);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
+        }
+
+        [TestCase(new int[] { 1, 2 , 3 }, 1, 2)]
+        [TestCase(new int[] { 1 }, 0, 1)]
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, 3, 4)]
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, 4, 5)]
+        [TestCase(new int[] { 1, 2, 3, 4, 5 }, 0, 1)]
+
+        public void GetValueByIndex_WhenValidIndexPassed_ShouldGetValueByIndex(
+int[] sourceArray, int getIndex, int returnedValue)
+        {
+            var actualList = Initializer.Initialize(sourceArray);
+
+           int expectedValue = actualList[getIndex];
+
+            CollectionAssert.AreEqual(expectedValue, returnedValue);
+        }
+
+        [TestCase(new int[] { 1, 2, 3 }, -1)]
+        [TestCase(new int[] { 1, 2, 3 }, 70)]
+        [TestCase(new int[] { }, 1)]
+
+        public void GetValueByIndex_WhenValidIndexNotPassed_ShouldCatchArgumentException(
+int[] sourceArray, int getIndex)
+        {
+            var actualList = Initializer.Initialize(sourceArray);
+
+            try
+            {
+                int expectedValue = actualList[getIndex];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Assert.Pass();
+            }
+
+
+            Assert.Fail();
+        }
+
+        [TestCase(new[] { 1, 2, 3 }, 0, 5, new[] { 5, 2, 3 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, 4, -10, new[] { 1, 2, 3, 4, -10 })]
+        [TestCase(new[] { 1, 2, 3, 4, 5 }, 2, 0, new[] { 1, 2, 0, 4, 5 })]
+        public void SetValueByIndex_WhenValidIndexPassed_ShouldSetValueByIndex(
+int[] sourceArray, int index, int value, int[] expectedArray)
+        {
+            var actualList = Initializer.Initialize(sourceArray);
+
+            actualList[index] = value;
+
+            CollectionAssert.AreEqual(expectedArray, actualList);
+        }
+
+        [TestCase(new int[] { 1, 2, 3 }, -1, 1)]
+        [TestCase(new int[] { 1, 2, 3 }, 70, 1)]
+        [TestCase(new int[] { }, 1, 1)]
+        public void SetValueByIndex_WhenValidIndexNotPassed_ShouldCatchArgumentException(
+int[] sourceArray, int index, int value)
+        {
+            var actualList = Initializer.Initialize(sourceArray);
+
+            try
+            {
+                actualList[index] = value;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Assert.Pass();
+            }
+
+
+            Assert.Fail();
         }
 
         [TestCase(new int[] { }, 10, new[] { 10 })]
@@ -59,7 +148,7 @@ namespace ListsUnitTests
         public void AddBack_WhenValidParamsPassed_ShouldInsertElementAtTheEnd(
    int[] sourceArray, int insertValue, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             actualList.AddBack(insertValue);
 
@@ -75,7 +164,7 @@ namespace ListsUnitTests
         public void AddByIndex_WhenValidParamsPassed_ShouldInsertElementByIndex(
             int[] sourceArray, int insertIndex, int insertValue, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             actualList.AddByIndex(insertIndex, insertValue);
 
@@ -88,7 +177,7 @@ namespace ListsUnitTests
         public void RemoveFront_WhenValidParamsPassed_ShouldRemoveElementAtTheFront(
    int[] sourceArray, int[] expectedArray, int returnedElement)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int expectedElement = actualList.RemoveFrontElement();
 
@@ -100,7 +189,7 @@ namespace ListsUnitTests
         public void RemoveFront_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveFrontElement();
@@ -119,7 +208,7 @@ int[] sourceArray)
         public void RemoveBack_WhenValidParamsPassed_ShouldRemoveElementAtTheBack(
 int[] sourceArray, int[] expectedArray, int returnedElement)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int expectedElement = actualList.RemoveBackElement();
 
@@ -131,7 +220,7 @@ int[] sourceArray, int[] expectedArray, int returnedElement)
         public void RemoveBack_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveBackElement();
@@ -153,7 +242,7 @@ int[] sourceArray)
         public void RemoveByIndexElement_WhenValidParamsPassed_ShouldRemoveElementByIndex(
 int[] sourceArray, int index, int[] expectedArray, int returnedElement)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int expectedElement = actualList.RemoveByIndexElement(index);
 
@@ -167,7 +256,7 @@ int[] sourceArray, int index, int[] expectedArray, int returnedElement)
         public void RemoveByIndexElement_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int index)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveByIndexElement(index);
@@ -188,9 +277,9 @@ int[] sourceArray, int index)
         public void RemoveFrontNElements_WhenValidParamsPassed_ShouldRemoveNElementsAtTheFront(
 int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            int[] remoteArray = actualList.RemoveFrontNElements(count);
+            IEnumerable<int> remoteArray = actualList.RemoveFrontNElements(count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
             CollectionAssert.AreEqual(remoteArray, returnedArray);
@@ -203,7 +292,7 @@ int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         public void RemoveFrontNElements_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int count)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveFrontNElements(count);
@@ -223,9 +312,9 @@ int[] sourceArray, int count)
         public void RemoveBackNElements_WhenValidParamsPassed_ShouldRemoveNElementsAtTheBack(
 int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            int[] remoteArray = actualList.RemoveBackNElements(count);
+            IEnumerable<int> remoteArray = actualList.RemoveBackNElements(count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
             CollectionAssert.AreEqual(remoteArray, returnedArray);
@@ -238,7 +327,7 @@ int[] sourceArray, int count, int[] expectedArray, int[] returnedArray)
         public void RemoveBackNElements_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int count)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveBackNElements(count);
@@ -262,9 +351,9 @@ int[] sourceArray, int count)
         public void RemoveNByIndex_WhenValidArgsPassed_ShouldRemoveElements
             (int[] sourceArray, int index, int count, int[] expectedArray, int[] returnedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            int[] remoteArray = actualList.RemoveByIndexNElements(index, count);
+            IEnumerable<int> remoteArray = actualList.RemoveByIndexNElements(index, count);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
             CollectionAssert.AreEqual(remoteArray, returnedArray);
@@ -278,7 +367,7 @@ int[] sourceArray, int count)
         public void RemoveNByIndex_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray, int index, int count)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveByIndexNElements(index, count);
@@ -299,7 +388,7 @@ int[] sourceArray, int index, int count)
         public void RemoveNByIndex_WhenValidParamsNotPassed_ShouldCatchIndexOutOfRangeException(
 int[] sourceArray, int index, int count)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.RemoveByIndexNElements(index, count);
@@ -320,7 +409,7 @@ int[] sourceArray, int index, int count)
         public void GetFirstIndexByValue_WhenValidArgsPassed_ShouldGetIndex
     (int[] sourceArray, int value, int expectedIndex)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualIndex = actualList.FirstIndexByValue(value);
 
@@ -334,7 +423,7 @@ int[] sourceArray, int index, int count)
         public void ReverseArray_WhenValidArgsPassed_ShouldReverseArray
     (int[] sourceArray, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             actualList.Reverse();
 
@@ -351,7 +440,7 @@ int[] sourceArray, int index, int count)
         public void GetMaxElementValue_WhenValidArgsPassed_ShouldGetMaxElementValue
 (int[] sourceArray, int expectedValue)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualValue = actualList.GetMaxElementValue();
 
@@ -362,7 +451,7 @@ int[] sourceArray, int index, int count)
         public void GetMaxElementValue_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.GetMaxElementValue();
@@ -386,7 +475,7 @@ int[] sourceArray)
         public void GetMinElementValue_WhenValidArgsPassed_ShouldGetMinElementValue
 (int[] sourceArray, int expectedValue)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualValue = actualList.GetMinElementValue();
 
@@ -397,7 +486,7 @@ int[] sourceArray)
         public void GetMinElementValue_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.GetMinElementValue();
@@ -420,7 +509,7 @@ int[] sourceArray)
         public void GetMaxElementIndex_WhenValidArgsPassed_ShouldGetMaxElementIndex
 (int[] sourceArray, int expectedIndex)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualIndex = actualList.GetMaxElementIndex();
 
@@ -431,7 +520,7 @@ int[] sourceArray)
         public void GetMaxElementIndex_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.GetMaxElementIndex();
@@ -454,7 +543,7 @@ int[] sourceArray)
         public void GetMinElementIndex_WhenValidArgsPassed_ShouldGetMinElementIndex
 (int[] sourceArray, int expectedIndex)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualIndex = actualList.GetMinElementIndex();
 
@@ -465,7 +554,7 @@ int[] sourceArray)
         public void GetMinElementIndex_WhenValidParamsNotPassed_ShouldCatchArgumentException(
 int[] sourceArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
                 actualList.GetMinElementIndex();
@@ -491,7 +580,7 @@ int[] sourceArray)
         public void SortArray_WhenValidArgsPassed_ShouldSortArray
 (int[] sourceArray, bool ascending, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             actualList.Sort(ascending);
 
@@ -508,7 +597,7 @@ int[] sourceArray)
         public void DeleteByValueFirst_WhenValidArgsPassed_ShouldDeleteByValueFirst
 (int[] sourceArray, int value, int expectedIndex, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
             int actualIndex = actualList.DeleteByValueFirst(value);
 
@@ -517,23 +606,23 @@ int[] sourceArray)
         }
 
 
-        [TestCase(new[] { 1 }, 1, new int[] { }, new[] { 0 })]
-        [TestCase(new[] { 4, 1, 3 }, 3, new[] { 4, 1 }, new[] { 2 })]
-        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, new[] { 1, 3, 9, 2 }, new[] { 0, 4 })]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, new[] { 11, 44, 0, 72, -5 }, new[] { 1, 6 })]
-        [TestCase(new[] { 1, 0, 0, 1, 1, 0, 1 }, 0, new[] { 1, 1, 1, 1 }, new[] { 1, 2 ,5 })]
-        [TestCase(new int[] { }, 2, new int[] { }, new[] { -1 })]
-        [TestCase(new[] { 1 }, 2, new[] { 1 }, new[] { -1 })]
-        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99, new[] { 11, -22, 44, 0, 72, -5, -22 }, new[] { -1 })]
+        [TestCase(new[] { 1 }, 1, new int[] { }, 1)]
+        [TestCase(new[] { 4, 1, 3 }, 3, new[] { 4, 1 }, 1)]
+        [TestCase(new[] { 4, 1, 3, 9, 4, 2 }, 4, new[] { 1, 3, 9, 2 }, 2)]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -22, new[] { 11, 44, 0, 72, -5 }, 2)]
+        [TestCase(new[] { 1, 0, 0, 1, 1, 0, 1 }, 0, new[] { 1, 1, 1, 1 }, 3)]
+        [TestCase(new int[] { }, 2, new int[] { }, 0)]
+        [TestCase(new[] { 1 }, 2, new[] { 1 }, 0)]
+        [TestCase(new[] { 11, -22, 44, 0, 72, -5, -22 }, -99, new[] { 11, -22, 44, 0, 72, -5, -22 }, 0)]
         public void DeleteByValueAll_WhenValidArgsPassed_ShouldDeleteByValueAll
-(int[] sourceArray, int value, int[] expectedArray, int[] expectedIndices)
+(int[] sourceArray, int value, int[] expectedArray, int expectedRemovedCount)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            int[] actualIndices = actualList.DeleteByValueAll(value);
+            int removedCount = actualList.DeleteByValueAll(value);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
-            CollectionAssert.AreEqual(expectedIndices, actualIndices);
+            Assert.AreEqual(expectedRemovedCount, removedCount);
         }
 
         [TestCase(new[] { 4, 1, 3 }, new[] { 1, 3 }, new[] { 1, 3, 4, 1, 3 })]
@@ -543,9 +632,9 @@ int[] sourceArray)
         public void AddFrontArray_WhenValidArgsPassed_ShouldAddFrontArray
 (int[] sourceArray, int[] addArray, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            actualList.AddFrontArray(addArray);
+            actualList.AddFrontItems(addArray);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
@@ -554,10 +643,10 @@ int[] sourceArray)
         public void AddFrontArray_WhenArrayNotPassedWithNotValidIndexesd_CatchArgumentException
             (int[] sourceArray, int[] addArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
-                actualList.AddFrontArray(addArray);
+                actualList.AddFrontItems(addArray);
             }
             catch (NullReferenceException)
             {
@@ -574,9 +663,9 @@ int[] sourceArray)
         public void AddBackArray_WhenValidArgsPassed_ShouldAddBackArray
 (int[] sourceArray, int[] addArray, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            actualList.AddBackArray(addArray);
+            actualList.AddBackItems(addArray);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
@@ -585,10 +674,10 @@ int[] sourceArray)
         public void AddBackArray_WhenArrayNotPassedWithNotValidIndexesd_CatchArgumentException
     (int[] sourceArray, int[] addArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
-                actualList.AddBackArray(addArray);
+                actualList.AddBackItems(addArray);
             }
             catch (NullReferenceException)
             {
@@ -609,9 +698,9 @@ int[] sourceArray)
         public void AddByIndex_WhenArrayPassedWithValidIndexesAndNotEmpty_ShouldInsertArrayByPosition
      (int[] sourceArray, int[] arrayToInsert, int insertPosition, int[] expectedArray)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
 
-            actualList.AddByIndex(insertPosition, arrayToInsert);
+            actualList.AddByIndexItems(insertPosition, arrayToInsert);
 
             CollectionAssert.AreEqual(expectedArray, actualList);
         }
@@ -622,10 +711,10 @@ int[] sourceArray)
         public void AddByIndex_WhenArrayNotPassedWithNotValidIndexes_ShouldCatchArgumentException
 (int[] sourceArray, int[] arrayToInsert, int insertPosition)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
-                actualList.AddByIndex(insertPosition, arrayToInsert);
+                actualList.AddByIndexItems(insertPosition, arrayToInsert);
             }
             catch (IndexOutOfRangeException)
             {
@@ -639,10 +728,10 @@ int[] sourceArray)
         public void AddByIndex_WhenArrayNotPassedWithValidIndexesAndEmpty_ShouldCatchArgumentException
 (int[] sourceArray, int[] arrayToInsert, int insertPosition)
         {
-            IList actualList = new MyLinkedList(sourceArray);
+            var actualList = Initializer.Initialize(sourceArray);
             try
             {
-                actualList.AddByIndex(insertPosition, arrayToInsert);
+                actualList.AddByIndexItems(insertPosition, arrayToInsert);
             }
             catch (NullReferenceException)
             {
@@ -652,25 +741,25 @@ int[] sourceArray)
             Assert.Fail();
         }
 
-        [Test]
-        public void ComplexTest()
-        {
-            MyLinkedList ml = new MyLinkedList();
+        //[Test]
+        //public void ComplexTest()
+        //{
+        //    MyLinkedList ml = _initializer.Initialize();
 
-            for (int i = 1; i <= 5; i++)
-            {
-                ml.AddBack(i);
-            }
+        //    for (int i = 1; i <= 5; i++)
+        //    {
+        //        ml.AddBack(i);
+        //    }
 
-            int removedThree = ml.RemoveByIndexElement(2);//3
-            int removedFour = ml.RemoveByIndexElement(2);//4
+        //    int removedThree = ml.RemoveByIndexElement(2);//3
+        //    int removedFour = ml.RemoveByIndexElement(2);//4
 
-            Assert.AreEqual(3, removedThree);
-            Assert.AreEqual(4, removedFour);
+        //    Assert.AreEqual(3, removedThree);
+        //    Assert.AreEqual(4, removedFour);
 
-            ml.AddBack(10);
+        //    ml.AddBack(10);
 
-            CollectionAssert.AreEqual(new[] { 1, 2, 5, 10 }, ml);
-        }
+        //    CollectionAssert.AreEqual(new[] { 1, 2, 5, 10 }, ml);
+        //}
     }
 }

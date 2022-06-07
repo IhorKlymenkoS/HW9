@@ -1,43 +1,50 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace HW9
 {
-    public interface IList : IEnumerable<int>
+    public interface IList<T>
+        : IEnumerable<T>
+        where T : IComparable<T>
     {
-        int this[int index]
+
+        IList<T> Initialize();
+        //IList<T> Initialize(int item);
+        IList<T> Initialize(IEnumerable<T> items);
+        T this[int index]
         {
             get;
             set;
         }
 
-        void AddFront(int value);
+        void AddFront(T value);
 
-        void AddBack(int value);
+        void AddBack(T value);
 
-        void AddByIndex(int index, int value);
+        void AddByIndex(int index, T value);
 
-        int RemoveFrontElement();
+        T RemoveFrontElement();
 
-        int RemoveBackElement();
+        T RemoveBackElement();
 
-        int RemoveByIndexElement(int index);
+        T RemoveByIndexElement(int index);
 
-        int[] RemoveFrontNElements(int value);
+        IEnumerable<T> RemoveFrontNElements(int count);
 
-        int[] RemoveBackNElements(int value);
+        IEnumerable<T> RemoveBackNElements(int count);
 
-        int[] RemoveByIndexNElements(int index, int value);
+        IEnumerable<T> RemoveByIndexNElements(int index, int count);
 
         int Capacity { get; }
         int Length { get; }
 
-        int FirstIndexByValue(int value);
+        int FirstIndexByValue(T value);
 
         void Reverse();
 
-        int GetMaxElementValue();
+        T GetMaxElementValue();
 
-        int GetMinElementValue();
+        T GetMinElementValue();
 
         int GetMaxElementIndex();
 
@@ -45,14 +52,19 @@ namespace HW9
 
         void Sort(bool ascending = true);
 
-        int DeleteByValueFirst(int value);
+        int DeleteByValueFirst(T value);
 
-        int[] DeleteByValueAll(int value);
+        /// <summary>
+        /// Remove all items by value
+        /// </summary>
+        /// <param name="value">Value to remove</param>
+        /// <returns>Count of removed items</returns>
+        int DeleteByValueAll(T value);
 
-        void AddFrontArray(int[] array);
+        void AddFrontItems(IEnumerable<T> items);
 
-        void AddBackArray(int[] array);
+        void AddBackItems(IEnumerable<T> items);
 
-        void AddByIndex(int index, int[] array);
+        void AddByIndexItems(int index, IEnumerable<T> items);
     }
 }

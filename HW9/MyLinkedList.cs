@@ -4,16 +4,17 @@ using System.Text;
 
 namespace HW9
 {
-    public class MyLinkedList : IList
+    public class MyLinkedList<T> : IList<T>
+        where T : IComparable<T>
     {
         private int _count;
         private Node _head;
 
         private class Node
         {
-            public int Value { get; set; }
+            public T Value { get; set; }
             public Node Next { get; set; }
-            public Node(int element)
+            public Node(T element)
             {
                 Value = element;
             }
@@ -23,10 +24,40 @@ namespace HW9
 
         public int Length => _count;
 
-        public int this[int index]
+        public T this[int index]
         {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
+            get
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                Node temp = _head;
+                
+                for(int i = 0; i != index; ++i)
+                {
+                    temp = temp.Next;
+                }
+
+                return temp.Value;
+            }
+            set
+            {
+                if (index < 0 || index >= Length)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                Node temp = _head;
+
+                for (int i = 0; i != index; ++i)
+                {
+                    temp = temp.Next;
+                }
+
+                temp.Value=value;
+            }
         }
 
         public MyLinkedList()
@@ -34,13 +65,13 @@ namespace HW9
             _count = 0;
         }
 
-        public MyLinkedList(int element)
+        public MyLinkedList(T element)
         {
             _count = 1;
             _head = new Node(element);
         }
 
-        public MyLinkedList(IEnumerable<int> elements)
+        public MyLinkedList(IEnumerable<T> elements)
         {
             foreach (var item in elements)
             {
@@ -48,7 +79,7 @@ namespace HW9
             }
         }
 
-        private (int index, int value) GetMaxValueIndexAndValue()
+        private (int index, T value) GetMaxValueIndexAndValue()
         {
             if (_head == null)
             {
@@ -56,12 +87,12 @@ namespace HW9
             }
 
             Node temp = _head;
-            int maxValue = _head.Value;
+            T maxValue = _head.Value;
             int currentIndex = 0;
             int maxIndex = currentIndex;
             do
             {
-                if (temp.Value > maxValue)
+                if (temp.Value.CompareTo(maxValue) == 1)
                 {
                     maxValue = temp.Value;
                     maxIndex = currentIndex;
@@ -73,7 +104,7 @@ namespace HW9
 
             return (maxIndex, maxValue);
         }
-        private (int index, int value) GetMinValueIndexAndValue()
+        private (int index, T value) GetMinValueIndexAndValue()
         {
             if (_head == null)
             {
@@ -81,12 +112,12 @@ namespace HW9
             }
 
             Node temp = _head;
-            int maxValue = _head.Value;
+            T maxValue = _head.Value;
             int currentIndex = 0;
             int maxIndex = currentIndex;
             do
             {
-                if (temp.Value < maxValue)
+                if (temp.Value.CompareTo(maxValue) == -1)
                 {
                     maxValue = temp.Value;
                     maxIndex = currentIndex;
@@ -99,17 +130,17 @@ namespace HW9
             return (maxIndex, maxValue);
         }
 
-        public void AddBack(int value)
+        public void AddBack(T value)
         {
             AddByIndex(Length, value);
         }
 
-        public void AddFront(int value)
+        public void AddFront(T value)
         {
             AddByIndex(0, value);
         }
 
-        public void AddByIndex(int index, int value)
+        public void AddByIndex(int index, T value)
         {
             if(index > Length || index < 0)
             {
@@ -124,8 +155,10 @@ namespace HW9
                 current = current.Next;
             }
 
-            Node insertable = new Node(value);
-            insertable.Next = current;
+            var insertable = new Node(value)
+            {
+                Next = current
+            };
             if (previous != null)
             {
                 previous.Next = insertable;
@@ -138,31 +171,31 @@ namespace HW9
             ++_count;
         }
 
-        public int RemoveFrontElement()
-        {
-            if (_count==0)
-            {
-                throw new IndexOutOfRangeException();
-            }
-
-            int result = RemoveByIndexElement(0);
-
-            return result;
-        }
-
-        public int RemoveBackElement()
+        public T RemoveFrontElement()
         {
             if (_count == 0)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            int result = RemoveByIndexElement(Length-1);
+            T result = RemoveByIndexElement(0);
 
             return result;
         }
 
-        public int RemoveByIndexElement(int index)
+        public T RemoveBackElement()
+        {
+            if (_count == 0)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            T result = RemoveByIndexElement(Length - 1);
+
+            return result;
+        }
+
+        public T RemoveByIndexElement(int index)
         {
             if (index >= Length || index < 0)
             {
@@ -177,7 +210,7 @@ namespace HW9
                 current = current.Next;
             }
 
-            int result;
+            T result;
             if (previous != null)
             {
                 result = previous.Next.Value;
@@ -194,56 +227,53 @@ namespace HW9
             return result;
         }
 
-        public int[] RemoveFrontNElements(int value)
+        public IEnumerable<T> RemoveFrontNElements(int value)
         {
             if (value > Length || value <= 0)
             {
                 throw new ArgumentException();
             }
 
-            int[] resolt = RemoveByIndexNElements(0,value);
-
-            return resolt;
+            return RemoveByIndexNElements(0,value);
         }
 
-        public int[] RemoveBackNElements(int value)
+        public IEnumerable<T> RemoveBackNElements(int count)
         {
-            if (value > Length || value <= 0)
+            if (count > Length || count <= 0)
             {
                 throw new ArgumentException();
             }
 
-            int[] resolt = RemoveByIndexNElements((Length - value), value);
-
-            return resolt;
+            return RemoveByIndexNElements(
+                Length - count, count);
         }
 
-        public int[] RemoveByIndexNElements(int index, int value)
+        public IEnumerable<T> RemoveByIndexNElements(int index, int count)
         {
             if (index >= Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
             }
-            if ((index+value) > Length || value <= 0)
+            if ((index + count) > Length || count <= 0)
             {
                 throw new ArgumentException();
             }
 
-            int[] resolt = new int[value];
-            for (int i = 0; i < value; i++)
+            var result = new T[count];
+            for (int i = 0; i < count; i++)
             {
-                resolt[i] = RemoveByIndexElement(index);
+                result[i] = RemoveByIndexElement(index);
             }
 
-            return resolt;
+            return result;
         }
 
-        public int FirstIndexByValue(int value)
+        public int FirstIndexByValue(T value)
         {
             var index = 0;
             foreach (var item in this)
             {
-                if(item == value)
+                if(item.CompareTo(value) == 0)
                 {
                     return index;
                 }
@@ -257,29 +287,23 @@ namespace HW9
         public void Reverse()
         {
             Node tempI = _head;
-            int index = 0;
-            int temp;
-            MyLinkedList reverse = new MyLinkedList();
-            do
+            var reverse = new MyLinkedList<T>();
+            while(tempI != null)
             {
                 reverse.AddFront(tempI.Value);
-                index++;
-            } while (index == Length);
-
-            foreach (var item in this)
-            {
-                temp = reverse._head.Value;
-                reverse._head = reverse._head.Next;
+                tempI = tempI.Next;
             }
+
+            _head = reverse._head;
         }
 
-        public int GetMaxElementValue()
+        public T GetMaxElementValue()
         {
             var (_, value) = GetMaxValueIndexAndValue();
             return value;
         }
 
-        public int GetMinElementValue()
+        public T GetMinElementValue()
         {
             var (_, value) = GetMinValueIndexAndValue();
             return value;
@@ -308,7 +332,7 @@ namespace HW9
                 {
                     if(tempI.Value.CompareTo(tempJ.Value) == coef)
                     {
-                        int temp = tempI.Value;
+                        T temp = tempI.Value;
                         tempI.Value = tempJ.Value;
                         tempJ.Value = temp;
                     }
@@ -320,7 +344,7 @@ namespace HW9
             }
         }
 
-        public int DeleteByValueFirst(int value)
+        public int DeleteByValueFirst(T value)
         {
             int index = FirstIndexByValue(value);
             if (index>=0)
@@ -331,63 +355,40 @@ namespace HW9
             return index;
         }
 
-        public int[] DeleteByValueAll(int value)
+        public int DeleteByValueAll(T value)
         {
- 
-            MyLinkedList tempList = new MyLinkedList();
-            int index = 0;
-            int count = 0;
+            var tempList = new MyLinkedList<T>();
             foreach (var item in this)
             {
-                if (item == value)
+                if (item.CompareTo(value) != 0)
                 {
-                    tempList.AddFront(index);
-                    count++;
-                }
-
-                ++index;
-            }
-
-            int[] result;
-            if (count!=0)
-            {
-                Node temp = tempList._head;
-                result = new int[count];
-
-                for (int i = 0; i < count; i++)
-                {
-                    result[i] = temp.Value;
-                    RemoveByIndexElement(temp.Value);
-                    temp = temp.Next;
+                    tempList.AddBack(item);
                 }
             }
-            else
-            {
-                result = new int[1];
-                result[0] = -1;
-            }
 
+            var removedCount = Length - tempList.Length;
+            _head = tempList._head;
 
-            return result;
+            return removedCount;
         }
 
-        public void AddFrontArray(int[] array)
+        public void AddFrontItems(IEnumerable<T> array)
         {
-            AddByIndex(0, array);
+            AddByIndexItems(0, array);
         }
 
-        public void AddBackArray(int[] array)
+        public void AddBackItems(IEnumerable<T> array)
         {
-            AddByIndex(Length, array);
+            AddByIndexItems(Length, array);
         }
 
-        public void AddByIndex(int index, int[] array)
+        public void AddByIndexItems(int index, IEnumerable<T> array)
         {
             if (index > Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
             }
-            if (array==null)
+            if (array == null)
             {
                 throw new NullReferenceException();
             }
@@ -400,7 +401,7 @@ namespace HW9
                 current = current.Next;
             }
 
-            MyLinkedList tempArray = new MyLinkedList(array);
+            var tempArray = new MyLinkedList<T>(array);
             Node tempTail = tempArray._head;
             while (tempTail.Next!=null)
             {
@@ -420,7 +421,7 @@ namespace HW9
             _count +=tempArray.Length;
                 }
 
-        public IEnumerator<int> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             Node temp = _head;
             while(temp != null)
@@ -433,6 +434,16 @@ namespace HW9
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public IList<T> Initialize()
+        {
+            return new MyLinkedList<T>();
+        }
+
+        public IList<T> Initialize(IEnumerable<T> items)
+        {
+            return new MyLinkedList<T>(items);
         }
     }
 }
