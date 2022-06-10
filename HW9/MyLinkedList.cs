@@ -73,6 +73,7 @@ namespace HW9
 
         public MyLinkedList(IEnumerable<T> elements)
         {
+            _count = 0;
             foreach (var item in elements)
             {
                 AddBack(item);
@@ -175,7 +176,7 @@ namespace HW9
         {
             if (_count == 0)
             {
-                throw new IndexOutOfRangeException();
+                throw new InvalidOperationException();
             }
 
             T result = RemoveByIndexElement(0);
@@ -187,7 +188,7 @@ namespace HW9
         {
             if (_count == 0)
             {
-                throw new IndexOutOfRangeException();
+                throw new InvalidOperationException();
             }
 
             T result = RemoveByIndexElement(Length - 1);
@@ -197,6 +198,10 @@ namespace HW9
 
         public T RemoveByIndexElement(int index)
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             if (index >= Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
@@ -227,18 +232,26 @@ namespace HW9
             return result;
         }
 
-        public IEnumerable<T> RemoveFrontNElements(int value)
+        public IEnumerable<T> RemoveFrontNElements(int count)
         {
-            if (value > Length || value <= 0)
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
+            if (count > Length || count <= 0)
             {
                 throw new ArgumentException();
             }
 
-            return RemoveByIndexNElements(0,value);
+            return RemoveByIndexNElements(0, count);
         }
 
         public IEnumerable<T> RemoveBackNElements(int count)
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             if (count > Length || count <= 0)
             {
                 throw new ArgumentException();
@@ -250,7 +263,11 @@ namespace HW9
 
         public IEnumerable<T> RemoveByIndexNElements(int index, int count)
         {
-            if (index >= Length || index < 0)
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
+            if (index > Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
             }
@@ -258,6 +275,7 @@ namespace HW9
             {
                 throw new ArgumentException();
             }
+
 
             var result = new T[count];
             for (int i = 0; i < count; i++)
@@ -299,24 +317,40 @@ namespace HW9
 
         public T GetMaxElementValue()
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             var (_, value) = GetMaxValueIndexAndValue();
             return value;
         }
 
         public T GetMinElementValue()
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             var (_, value) = GetMinValueIndexAndValue();
             return value;
         }
 
         public int GetMaxElementIndex()
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             var (index, _) = GetMaxValueIndexAndValue();
             return index;
         }
 
         public int GetMinElementIndex()
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             var (index, _) = GetMinValueIndexAndValue();
             return index;
         }
@@ -346,8 +380,12 @@ namespace HW9
 
         public int DeleteByValueFirst(T value)
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             int index = FirstIndexByValue(value);
-            if (index>=0)
+            if (index!=-1)
             {
                 RemoveByIndexElement(index);
             }
@@ -357,6 +395,10 @@ namespace HW9
 
         public int DeleteByValueAll(T value)
         {
+            if (Length == 0)
+            {
+                throw new InvalidOperationException();
+            }
             var tempList = new MyLinkedList<T>();
             foreach (var item in this)
             {
@@ -374,23 +416,49 @@ namespace HW9
 
         public void AddFrontItems(IEnumerable<T> array)
         {
+            int count = 0;
+            foreach (var item in array)
+            {
+                count++;
+            }
+            if (count == 0)
+            {
+                throw new ArgumentException();
+            }
+
             AddByIndexItems(0, array);
         }
 
         public void AddBackItems(IEnumerable<T> array)
         {
+            int count = 0;
+            foreach (var item in array)
+            {
+                count++;
+            }
+            if (count == 0)
+            {
+                throw new ArgumentException();
+            }
+
             AddByIndexItems(Length, array);
         }
 
         public void AddByIndexItems(int index, IEnumerable<T> array)
         {
+            int count = 0;
+            foreach (var item in array)
+            {
+                count++;
+            }
+            if (count == 0)
+            {
+                throw new ArgumentException();
+            }
+
             if (index > Length || index < 0)
             {
                 throw new IndexOutOfRangeException();
-            }
-            if (array == null)
-            {
-                throw new NullReferenceException();
             }
 
             Node current = _head;
@@ -419,7 +487,7 @@ namespace HW9
             }
 
             _count +=tempArray.Length;
-                }
+           }
 
         public IEnumerator<T> GetEnumerator()
         {
