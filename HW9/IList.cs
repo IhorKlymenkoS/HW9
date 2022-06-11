@@ -7,9 +7,8 @@ namespace HW9
         : IEnumerable<T>
         where T : IComparable<T>
     {
-
         IList<T> Initialize();
-        //IList<T> Initialize(int item);
+
         IList<T> Initialize(IEnumerable<T> items);
         T this[int index]
         {
@@ -54,11 +53,6 @@ namespace HW9
 
         int DeleteByValueFirst(T value);
 
-        /// <summary>
-        /// Remove all items by value
-        /// </summary>
-        /// <param name="value">Value to remove</param>
-        /// <returns>Count of removed items</returns>
         int DeleteByValueAll(T value);
 
         void AddFrontItems(IEnumerable<T> items);

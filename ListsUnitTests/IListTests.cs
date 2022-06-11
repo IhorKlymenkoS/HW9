@@ -223,7 +223,6 @@ namespace ListsUnitTests
                 Assert.Pass();
             }
 
-
             Assert.Fail();
         }
 
@@ -257,7 +256,6 @@ namespace ListsUnitTests
                 Assert.Pass();
             }
 
-
             Assert.Fail();
         }
 
@@ -275,7 +273,6 @@ namespace ListsUnitTests
             {
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
@@ -518,7 +515,6 @@ namespace ListsUnitTests
             {
                 Assert.Pass();
             }
-
 
             Assert.Fail();
         }
